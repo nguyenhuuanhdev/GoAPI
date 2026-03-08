@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Users</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #09090b;
+      --surface: #111113;
+      --surface2: #18181b;
+      --border: #27272a;
+      --border2: #3f3f46;
+      --text: #fafafa;
+      --muted: #71717a;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-bg: rgba(99,102,241,0.08);
+      --danger: #f43f5e;
+      --danger-bg: rgba(244,63,94,0.08);
+      --success: #10b981;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'Geist', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    .page { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* Header */
+    .header { margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .badge {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid rgba(99,102,241,0.25);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Form */
+    .form-section { padding: 20px; border-bottom: 1px solid var(--border); }
+
+    .form-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type=text], input[type=number] {
+      font-family: 'Geist', sans-serif;
+      font-size: 13.5px;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 11px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input[type=text]:focus, input[type=number]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    input::placeholder { color: var(--muted); }
+    input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #inp-id   { width: 72px; }
+    #inp-name { width: 160px; }
+    #inp-age  { width: 80px; }
+
+    .form-actions { display: flex; gap: 6px; margin-left: auto; align-items: flex-end; }
+
+    /* Buttons */
+    .btn {
+      font-family: 'Geist', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      line-height: 1;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--muted);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { color: var(--text); border-color: var(--border2); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .btn-danger:hover { background: var(--danger-bg); color: var(--danger); }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .count {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 1px 8px;
+      border-radius: 20px;
+    }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 10px 20px;
+      text-align: left;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    tr.editing { background: var(--accent-bg) !important; }
+
+    td { padding: 12px 20px; vertical-align: middle; }
+
+    .td-id { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); width: 60px; }
+    .td-name { font-weight: 500; }
+    .td-age { width: 80px; }
+
+    .age-chip {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 2px 10px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .td-actions { width: 110px; }
+    .action-group { display: flex; gap: 2px; }
+
+    /* Empty */
+    .empty { text-align: center; padding: 52px 20px; color: var(--muted); font-size: 13px; }
+    .empty-icon { font-size: 24px; margin-bottom: 10px; opacity: 0.2; }
+
+    /* Edit indicator */
+    .edit-badge {
+      display: none;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid rgba(99,102,241,0.25);
+      padding: 4px 10px;
+      border-radius: 6px;
+      align-items: center;
+      gap: 5px;
+    }
+    .edit-badge.show { display: inline-flex; }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 999; pointer-events: none; }
+    .toast {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: all;
+      border: 1px solid transparent;
+      animation: tin 0.2s ease, tout 0.25s ease 2.5s forwards;
+    }
+    .tok { background: rgba(16,185,129,0.1); color: var(--success); border-color: rgba(16,185,129,0.2); }
+    .terr { background: var(--danger-bg); color: var(--danger); border-color: rgba(244,63,94,0.2); }
+    @keyframes tin  { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes tout { to   { opacity:0; } }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>User Management</h1>
+    <span class="badge">localhost:8080</span>
+  </div>
+
+  <div class="card">
+
+    <div class="form-section">
+      <div class="form-row">
+        <div class="field">
+          <label>ID</label>
+          <input type="text" id="inp-id" placeholder="1"/>
+        </div>
+        <div class="field">
+          <label>Họ tên</label>
+          <input type="text" id="inp-name" placeholder="Nguyễn Văn A"/>
+        </div>
+        <div class="field">
+          <label>Tuổi</label>
+          <input type="number" id="inp-age" placeholder="22" min="1" max="120"/>
+        </div>
+        <div class="form-actions">
+          <span class="edit-badge" id="editBadge">✎ Đang sửa</span>
+          <button class="btn btn-secondary" id="btnCancel" onclick="cancelEdit()" style="display:none">Huỷ</button>
+          <button class="btn btn-primary" id="btnSubmit" onclick="submitForm()">+ Thêm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">Danh sách <span class="count" id="countBadge">0</span></div>
+      <button class="btn btn-ghost" onclick="loadUsers()">↻ Làm mới</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Họ tên</th><th>Tuổi</th><th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="4"><div class="empty"><div class="empty-icon">⊘</div>Đang tải...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const API = 'http://localhost:8080';
+  let editingId = null;
+
+  async function loadUsers() {
+    try {
+      const res = await fetch(`${API}/users`);
+      const users = await res.json();
+      document.getElementById('countBadge').textContent = users.length;
+      const tbody = document.getElementById('tbody');
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">⊘</div>Chưa có user nào</div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = users.map(u => `
+        <tr id="row-${u.id}" ${editingId === String(u.id) ? 'class="editing"' : ''}>
+          <td class="td-id">${u.id}</td>
+          <td class="td-name">${u.name}</td>
+          <td class="td-age"><span class="age-chip">${u.age}</span></td>
+          <td class="td-actions">
+            <div class="action-group">
+              <button class="btn btn-ghost" onclick="editUser('${u.id}','${u.name}',${u.age})">✎ Sửa</button>
+              <button class="btn btn-danger" onclick="deleteUser('${u.id}')">✕</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) { toast('Lỗi kết nối API', 'err'); }
+  }
+
+  function editUser(id, name, age) {
+    editingId = String(id);
+    document.getElementById('inp-id').value = id;
+    document.getElementById('inp-id').disabled = true;
+    document.getElementById('inp-name').value = name;
+    document.getElementById('inp-age').value = age;
+    document.getElementById('btnSubmit').textContent = '✓ Cập nhật';
+    document.getElementById('btnCancel').style.display = 'inline-flex';
+    document.getElementById('editBadge').classList.add('show');
+    document.getElementById('inp-name').focus();
+    loadUsers();
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    document.getElementById('inp-id').value = '';
+    document.getElementById('inp-id').disabled = false;
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-age').value = '';
+    document.getElementById('btnSubmit').textContent = '+ Thêm';
+    document.getElementById('btnCancel').style.display = 'none';
+    document.getElementById('editBadge').classList.remove('show');
+    loadUsers();
+  }
+
+  async function submitForm() {
+    const name = document.getElementById('inp-name').value.trim();
+    const age  = parseInt(document.getElementById('inp-age').value);
+    if (!name || !age) return toast('Vui lòng điền đầy đủ', 'err');
+
+    if (editingId) {
+      const res = await fetch(`${API}/users/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age })
+      });
+      if (res.ok) { toast('Đã cập nhật ' + name, 'ok'); cancelEdit(); }
+      else toast('Cập nhật thất bại', 'err');
+    } else {
+      const id = document.getElementById('inp-id').value.trim();
+      if (!id) return toast('Vui lòng nhập ID', 'err');
+      const res = await fetch(`${API}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, age })
+      });
+      if (res.ok) { toast('Đã thêm ' + name, 'ok'); cancelEdit(); }
+      else toast('Thêm thất bại', 'err');
+    }
+    loadUsers();
+  }
+
+  async function deleteUser(id) {
+    if (!confirm(`Xoá user #${id}?`)) return;
+    const res = await fetch(`${API}/users/${id}`, { method: 'DELETE' });
+    if (res.ok) toast('Đã xoá #' + id, 'ok');
+    else toast('Xoá thất bại', 'err');
+    loadUsers();
+  }
+
+  function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = `toast ${type === 'ok' ? 'tok' : 'terr'}`;
+    el.textContent = (type === 'ok' ? '✓ ' : '✕ ') + msg;
+    document.getElementById('toast').appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  loadUsers();
+</script>
+</body>
+</html>

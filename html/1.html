@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Users</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+    input { padding: 6px; margin: 4px; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 6px 12px; margin: 4px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <h2>Quản lý Users</h2>
+
+  <div>
+    <input id="id" placeholder="ID"/>
+    <input id="name" placeholder="Tên"/>
+    <input id="age" placeholder="Tuổi" type="number"/>
+    <button onclick="submitForm()">Thêm</button>
+    <button onclick="cancelEdit()" id="btnCancel" style="display:none">Huỷ</button>
+    <button onclick="loadUsers()">Tải lại</button>
+  </div>
+
+  <table>
+    <thead><tr><th>ID</th><th>Tên</th><th>Tuổi</th><th>Thao tác</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+<script>
+  const API = 'http://localhost:8080';
+  let editingId = null;
+
+  async function loadUsers() {
+    const res = await fetch(`${API}/users`);
+    const users = await res.json();
+    document.getElementById('tbody').innerHTML = users.map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td>${u.name}</td>
+        <td>${u.age}</td>
+        <td>
+          <button onclick="editUser('${u.id}', '${u.name}', ${u.age})">Sửa</button>
+          <button onclick="deleteUser('${u.id}')">Xoá</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function editUser(id, name, age) {
+    editingId = id;
+    document.getElementById('id').value = id;
+    document.getElementById('id').disabled = true;
+    document.getElementById('name').value = name;
+    document.getElementById('age').value = age;
+    document.querySelector('button').textContent = 'Cập nhật';
+    document.getElementById('btnCancel').style.display = 'inline';
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    document.getElementById('id').value = '';
+    document.getElementById('id').disabled = false;
+    document.getElementById('name').value = '';
+    document.getElementById('age').value = '';
+    document.querySelector('button').textContent = 'Thêm';
+    document.getElementById('btnCancel').style.display = 'none';
+  }
+
+  async function submitForm() {
+    const id   = document.getElementById('id').value;
+    const name = document.getElementById('name').value;
+    const age  = parseInt(document.getElementById('age').value);
+
+    if (editingId) {
+      await fetch(`${API}/users/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age })
+      });
+      cancelEdit();
+    } else {
+      await fetch(`${API}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, age })
+      });
+    }
+    loadUsers();
+  }
+
+  async function deleteUser(id) {
+    await fetch(`${API}/users/${id}`, { method: 'DELETE' });
+    loadUsers();
+  }
+
+  loadUsers();
+</script>
+</body>
+</html>
