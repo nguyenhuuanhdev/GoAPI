@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("secret_key_cua_ban") // đổi thành key bí mật thật
+var jwtSecret = []byte("secret_key_cua_ban") 
 
 func Register(c *gin.Context) {
     var input models.LoginInput
@@ -22,7 +22,7 @@ func Register(c *gin.Context) {
 
     account := models.Account{
         Username: input.Username,
-        Password: input.Password, // ⚠️ sau nên hash password
+        Password: input.Password, 
     }
 
     if err := database.DB.Create(&account).Error; err != nil {

@@ -26,7 +26,7 @@ func GetUserByID(c *gin.Context) {
     id := c.Param("id")
     var user models.User
 
-    // Chỉ lấy user thuộc account này
+    
     if err := database.DB.Where("id = ? AND account_id = ?", id, accountID).First(&user).Error; err != nil {
         c.JSON(http.StatusNotFound, gin.H{"message": "không tìm thấy hoặc không có quyền"})
         return
@@ -42,7 +42,7 @@ func CreateUser(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-    newUser.AccountID = uint(accountID.(float64)) // ✅ gán account
+    newUser.AccountID = uint(accountID.(float64))
     database.DB.Create(&newUser)
     c.JSON(http.StatusCreated, gin.H{"message": "đã tạo user", "user": newUser})
 }
@@ -52,7 +52,6 @@ func UpdateUser(c *gin.Context) {
     id := c.Param("id")
     var user models.User
 
-    // Chỉ tìm user thuộc account này
     if err := database.DB.Where("id = ? AND account_id = ?", id, accountID).First(&user).Error; err != nil {
         c.JSON(http.StatusNotFound, gin.H{"message": "không tìm thấy hoặc không có quyền"})
         return
@@ -74,7 +73,6 @@ func DeleteUser(c *gin.Context) {
     id := c.Param("id")
     var user models.User
 
-    // Chỉ xoá user thuộc account này
     if err := database.DB.Where("id = ? AND account_id = ?", id, accountID).First(&user).Error; err != nil {
         c.JSON(http.StatusNotFound, gin.H{"message": "không tìm thấy hoặc không có quyền"})
         return
