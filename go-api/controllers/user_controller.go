@@ -15,98 +15,71 @@ func GetHome(c *gin.Context) {
 }
 
 func GetUsers(c *gin.Context) {
-
-	var users []models.User
-
-	database.DB.Find(&users)
-
-	c.JSON(http.StatusOK, users)
+    accountID, _ := c.Get("id")
+    var users []models.User
+    database.DB.Where("account_id = ?", accountID).Find(&users)
+    c.JSON(http.StatusOK, users)
 }
 
 func GetUserByID(c *gin.Context) {
+    accountID, _ := c.Get("id")
+    id := c.Param("id")
+    var user models.User
 
-	id := c.Param("id")
+    // Chỉ lấy user thuộc account này
+    if err := database.DB.Where("id = ? AND account_id = ?", id, accountID).First(&user).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "không tìm thấy hoặc không có quyền"})
+        return
+    }
 
-	var user models.User
-
-	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "không tìm thấy người dùng",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, user)
+    c.JSON(http.StatusOK, user)
 }
 
 func CreateUser(c *gin.Context) {
-
-	var newUser models.User
-
-	if err := c.BindJSON(&newUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	database.DB.Create(&newUser)
-
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "đã tạo người dùng",
-		"user":    newUser,
-	})
+    accountID, _ := c.Get("id")
+    var newUser models.User
+    if err := c.BindJSON(&newUser); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    newUser.AccountID = uint(accountID.(float64)) // ✅ gán account
+    database.DB.Create(&newUser)
+    c.JSON(http.StatusCreated, gin.H{"message": "đã tạo user", "user": newUser})
 }
 
 func UpdateUser(c *gin.Context) {
+    accountID, _ := c.Get("id")
+    id := c.Param("id")
+    var user models.User
 
-	id := c.Param("id")
+    // Chỉ tìm user thuộc account này
+    if err := database.DB.Where("id = ? AND account_id = ?", id, accountID).First(&user).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "không tìm thấy hoặc không có quyền"})
+        return
+    }
 
-	var user models.User
-
-	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "không tìm thấy người dùng",
-		})
-		return
-	}
-
-	var input models.User
-
-	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	user.Name = input.Name
-	user.Age = input.Age
-
-	database.DB.Save(&user)
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "đã cập nhật người dùng",
-		"user":    user,
-	})
+    var input models.User
+    if err := c.BindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    user.Name = input.Name
+    user.Age = input.Age
+    database.DB.Save(&user)
+    c.JSON(http.StatusOK, gin.H{"message": "đã cập nhật", "user": user})
 }
 
 func DeleteUser(c *gin.Context) {
+    accountID, _ := c.Get("id")
+    id := c.Param("id")
+    var user models.User
 
-	id := c.Param("id")
+    // Chỉ xoá user thuộc account này
+    if err := database.DB.Where("id = ? AND account_id = ?", id, accountID).First(&user).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "không tìm thấy hoặc không có quyền"})
+        return
+    }
 
-	var user models.User
-
-	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "không tìm thấy người dùng",
-		})
-		return
-	}
-
-	database.DB.Delete(&user)
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "xóa user thành công",
-	})
+    database.DB.Delete(&user)
+    c.JSON(http.StatusOK, gin.H{"message": "xóa thành công"})
 }
